@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 # modify the paths accordingly with your installation
-ExecStart=/usr/local/src/edumeet/server/dist/server.js
-WorkingDirectory=/usr/local/src/edumeet/server
+ExecStart=/usr/share/edumeet/server.js
+WorkingDirectory=/usr/share/edumeet
 Restart=always
 RestartSec=1
 User=nobody
