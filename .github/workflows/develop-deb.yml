@@ -3,8 +3,6 @@ name: Debian package
 on: 
   push:
     branches: [ master ]
-#  pull_request:
-#    branches: [ develop ]
 
 jobs:
   build:
@@ -35,31 +33,22 @@ jobs:
       id: build-deb
       run: |
         cd edumeet
-        cp server/config/config.example.js server/config/config.js
-        cp server/config/config.example.yaml server/config/config.yaml
+        TARGET=/home/runner/package
         cp app/public/config/config.example.js app/public/config/config.js
-        cd app
-        yarn install && yarn build
-        cd ../server
-        yarn install && yarn build
-        cat <<< $(jq '.bundleDependencies += .dependencies' package.json) > package.json
-        npm pack
+        cd app && yarn install && yarn build && cd ..
+        cd server && yarn install && yarn build && cd ..
         VERSION=${{ steps.get-version.outputs.VERSION }}
         DATE=$(date)
-        mkdir -p /home/runner/package
-        cd /home/runner/package
-        mkdir DEBIAN
-        mkdir -p usr/local/src/edumeet/server
-        mkdir -p etc/systemd/system/
-        tar -xf /home/runner/work/***/***/***/server/***-server-$VERSION.tgz package/ 1>/dev/null 2>/dev/null || true
-        mv package/* usr/local/src/edumeet/server/
-        mv /home/runner/work/***/***/***/*.service etc/systemd/system/
-        rm -rf package
+        mkdir -p ${TARGET}/DEBIAN
+        mkdir -p ${TARGET}/usr/share/edumeet
+        mkdir -p ${TARGET}/lib/systemd/system/
+        mkdir -p ${TARGET}/etc/edumeet/
+        cp server/config/config.example.js ${TARGET}/etc/edumeet/config.js
+        cp server/config/config.example.yaml ${TARGET}/etc/config/config.yaml
+        cp -r server/dist/* ${TARGET}/usr/share/edumeet
+        ln -s /etc/edumeet/config.js ${TARGET}/usr/share/edumeet/config/config.js
+        mv edumeet.service etc/systemd/system/
         touch DEBIAN/md5sums
-        touch DEBIAN/md5sums
-        touch DEBIAN/control
-        #find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum  1>/dev/null 2>/dev/null || true
-        #
         cat > DEBIAN/control <<EOF
         Package: edumeet
         Version: $VERSION
@@ -76,10 +65,6 @@ jobs:
         #
         cat > DEBIAN/postinst <<EOF
         #!/bin/bash
-        mkdir -p /etc/edumeet/
-        ln -s /usr/local/src/edumeet/server/config/config.js /etc/edumeet/server-config.js || true
-        ln -s /usr/local/src/edumeet/server/dist/config/config.yaml /etc/edumeet/server-config.yaml || true
-        ln -s /usr/local/src/edumeet/server/public/config/config.js /etc/edumeet/client-config.js || true
         systemctl daemon-reload
         systemctl enable edumeet
         echo "eduMEET multiparty meeting is installed.\n"
