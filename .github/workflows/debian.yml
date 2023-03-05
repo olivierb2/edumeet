@@ -46,6 +46,7 @@ jobs:
         cp server/config/config.example.js ${TARGET}/etc/edumeet/config.js
         cp server/config/config.example.yaml ${TARGET}/etc/edumeet/config.yaml
         cp -r server/dist/* ${TARGET}/usr/share/edumeet
+        cp -r server/node_modules ${TARGET}/usr/share/edumeet
         ln -sf /etc/edumeet/config.js ${TARGET}/usr/share/edumeet/config/config.js
         mv edumeet.service ${TARGET}/lib/systemd/system/
         touch ${TARGET}/DEBIAN/md5sums
