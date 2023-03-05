@@ -48,8 +48,8 @@ jobs:
         cp -r server/dist/* ${TARGET}/usr/share/edumeet
         ln -sf /etc/edumeet/config.js ${TARGET}/usr/share/edumeet/config/config.js
         mv edumeet.service ${TARGET}/lib/systemd/system/
-        touch DEBIAN/md5sums
-        cat > DEBIAN/control <<EOF
+        touch ${TARGET}/DEBIAN/md5sums
+        cat > ${TARGET}/DEBIAN/control <<EOF
         Package: edumeet
         Version: $VERSION
         Maintainer: eduMEET team (${{ github.server_url }}/${{ github.repository }})
@@ -63,7 +63,7 @@ jobs:
         Depends: nodejs (>= 16), redis
         EOF
         #
-        cat > DEBIAN/postinst <<EOF
+        cat > ${TARGET}/DEBIAN/postinst <<EOF
         #!/bin/bash
         systemctl daemon-reload
         systemctl enable edumeet
@@ -73,8 +73,8 @@ jobs:
         echo "\n\nAfter configuration, start service with 'sudo systemctl start edumeet' command.\n\n"
         EOF
         #
-        chmod 775 DEBIAN/postinst
-        cd ../
+        chmod 775 ${TARGET}/DEBIAN/postinst
+        cd ${TARGET}
         dpkg-deb -Zgzip --build package
         mv /home/runner/package.deb /home/runner/edumeet-$VERSION.deb
         
