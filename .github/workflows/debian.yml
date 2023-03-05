@@ -47,7 +47,7 @@ jobs:
         cp server/config/config.example.yaml ${TARGET}/etc/edumeet/config.yaml
         cp -r server/dist/* ${TARGET}/usr/share/edumeet
         ln -sf /etc/edumeet/config.js ${TARGET}/usr/share/edumeet/config/config.js
-        mv edumeet.service etc/systemd/system/
+        mv edumeet.service ${TARGET}/lib/systemd/system/
         touch DEBIAN/md5sums
         cat > DEBIAN/control <<EOF
         Package: edumeet
