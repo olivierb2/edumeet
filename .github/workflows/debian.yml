@@ -74,7 +74,7 @@ jobs:
         EOF
         #
         chmod 775 ${TARGET}/DEBIAN/postinst
-        cd ${TARGET}
+        cd ${TARGET}/..
         dpkg-deb -Zgzip --build package
         mv /home/runner/package.deb /home/runner/edumeet-$VERSION.deb
         
